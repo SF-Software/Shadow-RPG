@@ -1,0 +1,6 @@
+[package]
+name = "Shadow-RPG"
+version = "0.1.0"
+authors = ["Joshua Astray <JoshuaSRKF@gmail.com>"]
+
+[dependencies]
