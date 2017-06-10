@@ -15,7 +15,6 @@ use opengl_graphics::{ GlGraphics, OpenGL };
 
 mod game_const;
 mod game;
-mod title;
 
 use game::Game;
 
