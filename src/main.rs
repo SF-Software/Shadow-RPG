@@ -1,13 +1,11 @@
 /* Project @ Shadow RPG
  * @ SF Software
  */
-#![feature(conservative_impl_trait)]
 
 extern crate piston;
 extern crate graphics;
 extern crate glutin_window;
 extern crate opengl_graphics;
-
 
 use piston::window::WindowSettings;
 use piston::event_loop::*;
@@ -16,10 +14,12 @@ use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{GlGraphics, OpenGL};
 
 mod entity;
+mod title;
 mod game_const;
 mod game;
 
-use game::game::Game;
+use game::Game;
+use title::Title;
 
 fn main() {
     // Change this to OpenGL::V2_1 if not working.
