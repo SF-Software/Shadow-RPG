@@ -6,6 +6,7 @@ extern crate piston;
 extern crate graphics;
 extern crate glutin_window;
 extern crate opengl_graphics;
+extern crate find_folder;
 
 use piston::window::WindowSettings;
 use piston::event_loop::*;
@@ -36,6 +37,7 @@ fn main() {
     let mut game = Game::new();
 
     let mut events = Events::new(EventSettings::new());
+
     while let Some(e) = events.next(&mut window) {
         if let Some(r) = e.render_args() {
             game.render(&r);

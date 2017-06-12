@@ -6,8 +6,9 @@ use piston::window::WindowSettings;
 use piston::event_loop::*;
 use piston::input::*;
 use glutin_window::GlutinWindow as Window;
-use opengl_graphics::{GlGraphics, OpenGL};
+use opengl_graphics::*;
 use graphics::Context;
+use find_folder::*;
 
 use game_const::BLACK;
 use game_const::RED;
@@ -32,7 +33,6 @@ impl Game {
         use graphics::*;
         let rb = &self.title;
         self.gl.draw(args.viewport(), |c, gl| {
-            clear(BLACK, gl);
             rb.renderer(gl, &c, args)
         });
     }

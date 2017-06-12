@@ -3,10 +3,11 @@
  */
 
 use entity;
-use opengl_graphics::{GlGraphics, OpenGL};
+use opengl_graphics::*;
 use graphics::Context;
 use piston::input::*;
 use game_const::RED;
+use find_folder::*;
 
 #[derive(Clone)]
 struct State {
@@ -31,10 +32,17 @@ impl entity::Input for Input {}
 pub struct Title {
 	state: State,
 	rendererState: RendererState,
+	image: Texture
 }
 
 impl Title {
 	pub fn new() -> Title {
+        let images = Search::ParentsThenKids(3, 3)
+            .for_folder("images").unwrap();
+
+        let title_image = images.join("title.jpg");
+        let title_image = Texture::from_path(&title_image).unwrap();
+
 		Title {
 			state: State {
 				color: RED,
@@ -44,6 +52,7 @@ impl Title {
                 color: RED,
                 rotation: 1.0,
             },
+            image: title_image
         }
     }
 }
@@ -51,6 +60,7 @@ impl Title {
 impl entity::Entity<State, RendererState, Input> for Title {
 	fn renderer(&self, gl: &mut GlGraphics, c: &Context, args: &RenderArgs) {
 		use graphics::*;
+
 		let square = rectangle::square(0.0, 0.0, 50.0);
 		let rotation = self.rendererState.rotation;
 		let (x, y) = ((args.width / 2) as f64, (args.height / 2) as f64);
@@ -59,6 +69,7 @@ impl entity::Entity<State, RendererState, Input> for Title {
 			.rot_rad(rotation)
 			.trans(-25.0, -25.0);
 
+        image(&self.image, c.transform, gl);
 		rectangle(self.rendererState.color, square, transform, gl);
 	}
 	fn update(s: &State, i: &Input) -> (State, RendererState, entity::CurrentState) {

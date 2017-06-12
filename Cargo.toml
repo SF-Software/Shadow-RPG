@@ -5,6 +5,7 @@ authors = ["Joshua Astray <JoshuaSRKF@gmail.com>"]
 
 [dependencies]
 num-rational = "0.1.37"
+find_folder = "0.3.0"
 piston = "0.32.0"
 piston2d-graphics = "0.21.1"
 pistoncore-glutin_window = "0.37.0"
