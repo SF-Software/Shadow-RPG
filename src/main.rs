@@ -1,32 +1,32 @@
-/* Project @ Shadow RPG 
+/* Project @ Shadow RPG
  * @ SF Software
  */
+#![feature(conservative_impl_trait)]
 
 extern crate piston;
 extern crate graphics;
 extern crate glutin_window;
 extern crate opengl_graphics;
 
+
 use piston::window::WindowSettings;
 use piston::event_loop::*;
 use piston::input::*;
 use glutin_window::GlutinWindow as Window;
-use opengl_graphics::{ GlGraphics, OpenGL };
+use opengl_graphics::{GlGraphics, OpenGL};
 
+mod entity;
 mod game_const;
 mod game;
 
-use game::Game;
+use game::game::Game;
 
 fn main() {
     // Change this to OpenGL::V2_1 if not working.
     let opengl = OpenGL::V3_2;
 
     // Create an Glutin window.
-    let mut window: Window = WindowSettings::new(
-            "Shadow RPG",
-            [800, 600]
-        )
+    let mut window: Window = WindowSettings::new("Shadow RPG", [800, 600])
         .opengl(opengl)
         .exit_on_esc(true)
         .build()
@@ -46,3 +46,4 @@ fn main() {
         }
     }
 }
+

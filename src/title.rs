@@ -1,6 +1,4 @@
-/* Project @ Shadow RPG 
+/* Project @ Shadow RPG
  * title
  */
-pub mod title {
-
-}
+pub mod title {}
