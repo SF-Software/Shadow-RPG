@@ -12,7 +12,6 @@
 ## Music
 ### Theme Song
 ### Background Music
-<<<<<<< HEAD
 
 ## Fonts
 * Arial

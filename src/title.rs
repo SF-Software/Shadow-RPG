@@ -7,8 +7,7 @@ use opengl_graphics::*;
 use opengl_graphics::glyph_cache::GlyphCache;
 use graphics::Context;
 use piston::input::*;
-use game_const::RED;
-use game_const::WHITE;
+use game_const::*;
 use find_folder::*;
 
 #[derive(Clone)]
@@ -81,7 +80,7 @@ impl entity::Entity<State, RendererState, Input> for Title {
         let fonts = Search::ParentsThenKids(3, 3)
             .for_folder("fonts").unwrap();
 
-        let glyphs = fonts.join("arial.ttf");
+        let glyphs = fonts.join("NotoSansCJKtc-Light.ttf");
         let mut glyphs = GlyphCache::new(glyphs).unwrap();
 
         let transform = c.transform
@@ -102,8 +101,12 @@ impl entity::Entity<State, RendererState, Input> for Title {
         let transform = c.transform
             .trans(680.0, 500.0);
         let btnExit = text::Text::new_color(WHITE, 32)
-            .draw("Exit  ", &mut glyphs, &c.draw_state, transform, gl);
+            .draw("Exit", &mut glyphs, &c.draw_state, transform, gl);
 
+        let transform = c.transform
+            .trans(0.0, 0.0);
+        let Shadow = text::Text::new_color(WHITE, 32)
+            .draw(" ", &mut glyphs, &c.draw_state, transform, gl);
     }
     fn update(s: &State, i: &Input) -> (State, RendererState, entity::CurrentState) {
         let new_state = State {
