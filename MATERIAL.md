@@ -1,7 +1,7 @@
 # Shadow RPG Material List
 ## Images
 ### Title
-* C-022 (空彩 http://loo.sakura.ne.jp/)
+* C-022 [空彩](http://loo.sakura.ne.jp/)
 
 ### CG
 ### Character
