@@ -34,17 +34,20 @@ pub struct Title {
     state: State,
     rendererState: RendererState,
     select: i32,
-    image: Texture
+    image: Texture,
+    glyphs: GlyphCache<'static>,
 }
 
 impl Title {
     pub fn new() -> Title {
-        let images = Search::ParentsThenKids(3, 3)
-            .for_folder("images").unwrap();
+        let images = Search::ParentsThenKids(3, 3).for_folder("images").unwrap();
 
         let title_image = images.join("title.jpg");
         let title_image = Texture::from_path(&title_image).unwrap();
+        let fonts = Search::ParentsThenKids(3, 3).for_folder("fonts").unwrap();
 
+        let glyphs = fonts.join("NotoSansCJKtc-Light.ttf");
+        let mut glyphs = GlyphCache::new(glyphs).unwrap();
         Title {
             state: State {
                 color: RED,
@@ -55,13 +58,14 @@ impl Title {
                 rotation: 1.0,
             },
             select: 0,
-            image: title_image
+            image: title_image,
+            glyphs: glyphs,
         }
     }
 }
 
 impl entity::Entity<State, RendererState, Input> for Title {
-    fn renderer(&self, gl: &mut GlGraphics, c: &Context, args: &RenderArgs) {
+    fn renderer(&mut self, gl: &mut GlGraphics, c: &Context, args: &RenderArgs) {
         use graphics::*;
 
         image(&self.image, c.transform, gl);
@@ -76,27 +80,30 @@ impl entity::Entity<State, RendererState, Input> for Title {
 
         rectangle(self.rendererState.color, square, transform, gl);
 
-        /* Request:
-         *   把glyphs移动到render的外部以加快渲染速度.
-         */
-        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        let fonts = Search::ParentsThenKids(3, 3)
-            .for_folder("fonts").unwrap();
 
-        let glyphs = fonts.join("NotoSansCJKtc-Light.ttf");
-        let mut glyphs = GlyphCache::new(glyphs).unwrap();
-        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        let mut glyphs = &mut self.glyphs;
+        text::Text::new_color(WHITE, 32).draw("Start",
+                                              glyphs,
+                                              &c.draw_state,
+                                              c.transform.trans(80.0, 500.0),
+                                              gl);
 
-        text::Text::new_color(WHITE, 32)
-            .draw("Start", &mut glyphs, &c.draw_state, c.transform.trans(80.0, 500.0), gl);
-        text::Text::new_color(WHITE, 32)
-            .draw("Load", &mut glyphs, &c.draw_state, c.transform.trans(280.0, 500.0), gl);
-        text::Text::new_color(WHITE, 32)
-            .draw("Settings", &mut glyphs, &c.draw_state, c.transform.trans(480.0, 500.0), gl);
-        text::Text::new_color(WHITE, 32)
-            .draw("Exit", &mut glyphs, &c.draw_state, c.transform.trans(680.0, 500.0), gl);
-        text::Text::new_color(WHITE, 32)
-            .draw(" ", &mut glyphs, &c.draw_state, c.transform, gl);
+        text::Text::new_color(WHITE, 32).draw("Load",
+                                              glyphs,
+                                              &c.draw_state,
+                                              c.transform.trans(280.0, 500.0),
+                                              gl);
+        text::Text::new_color(WHITE, 32).draw("Settings",
+                                              glyphs,
+                                              &c.draw_state,
+                                              c.transform.trans(480.0, 500.0),
+                                              gl);
+        text::Text::new_color(WHITE, 32).draw("Exit",
+                                              glyphs,
+                                              &c.draw_state,
+                                              c.transform.trans(680.0, 500.0),
+                                              gl);
+        text::Text::new_color(WHITE, 32).draw(" ", glyphs, &c.draw_state, c.transform, gl);
     }
     fn update(s: &State, i: &Input) -> (State, RendererState, entity::CurrentState) {
         let new_state = State {
@@ -116,3 +123,4 @@ impl entity::Entity<State, RendererState, Input> for Title {
         self.rendererState = r;
     }
 }
+

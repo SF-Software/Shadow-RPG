@@ -19,7 +19,7 @@ pub trait Entity<S, R, I>
           I: Input
 {
     fn process(&mut self, i: I);
-    fn renderer(&self, &mut GlGraphics, &Context, &RenderArgs);
+    fn renderer(&mut self, &mut GlGraphics, &Context, &RenderArgs);
     fn update(s: &S, i: &I) -> (S, R, CurrentState);
 }
 

@@ -31,14 +31,13 @@ impl Game {
 
     pub fn render(&mut self, args: &RenderArgs) {
         use graphics::*;
-        let rb = &self.title;
-        self.gl.draw(args.viewport(), |c, gl| {
-            rb.renderer(gl, &c, args)
-        });
+        let rb = &mut self.title;
+        self.gl
+            .draw(args.viewport(), |c, gl| rb.renderer(gl, &c, args));
     }
 
     pub fn update(&mut self, args: &UpdateArgs) {
-        self.title
-            .process(title::Input { dt: args.dt });
+        self.title.process(title::Input { dt: args.dt });
     }
 }
+
