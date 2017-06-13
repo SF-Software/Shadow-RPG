@@ -77,36 +77,27 @@ impl entity::Entity<State, RendererState, Input> for Title {
 
         rectangle(self.rendererState.color, square, transform, gl);
 
+        /* Request:
+         *   把glyphs移动到render的外部以加快渲染速度.
+         */
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         let fonts = Search::ParentsThenKids(3, 3)
             .for_folder("fonts").unwrap();
 
         let glyphs = fonts.join("NotoSansCJKtc-Light.ttf");
         let mut glyphs = GlyphCache::new(glyphs).unwrap();
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-        let transform = c.transform
-            .trans(80.0, 500.0);
-        let btnStart = text::Text::new_color(WHITE, 32)
-            .draw("Start", &mut glyphs, &c.draw_state, transform, gl);
-
-        let transform = c.transform
-            .trans(280.0, 500.0);
-        let btnLoad = text::Text::new_color(WHITE, 32)
-            .draw("Load", &mut glyphs, &c.draw_state, transform, gl);
-
-        let transform = c.transform
-            .trans(480.0, 500.0);
-        let btnSetting = text::Text::new_color(WHITE, 32)
-            .draw("Setting", &mut glyphs, &c.draw_state, transform, gl);
-        
-        let transform = c.transform
-            .trans(680.0, 500.0);
-        let btnExit = text::Text::new_color(WHITE, 32)
-            .draw("Exit", &mut glyphs, &c.draw_state, transform, gl);
-
-        let transform = c.transform
-            .trans(0.0, 0.0);
-        let Shadow = text::Text::new_color(WHITE, 32)
-            .draw(" ", &mut glyphs, &c.draw_state, transform, gl);
+        text::Text::new_color(WHITE, 32)
+            .draw("Start", &mut glyphs, &c.draw_state, c.transform.trans(80.0, 500.0), gl);
+        text::Text::new_color(WHITE, 32)
+            .draw("Load", &mut glyphs, &c.draw_state, c.transform.trans(280.0, 500.0), gl);
+        text::Text::new_color(WHITE, 32)
+            .draw("Settings", &mut glyphs, &c.draw_state, c.transform.trans(480.0, 500.0), gl);
+        text::Text::new_color(WHITE, 32)
+            .draw("Exit", &mut glyphs, &c.draw_state, c.transform.trans(680.0, 500.0), gl);
+        text::Text::new_color(WHITE, 32)
+            .draw(" ", &mut glyphs, &c.draw_state, c.transform, gl);
     }
     fn update(s: &State, i: &Input) -> (State, RendererState, entity::CurrentState) {
         let new_state = State {
@@ -122,7 +113,6 @@ impl entity::Entity<State, RendererState, Input> for Title {
 
     fn process(&mut self, i: Input) {
         let (s, r, c) = Self::update(&self.state, &i);
-        self.state = s;
-        self.rendererState = r;
+        self.rendererState = r;
     }
 }
