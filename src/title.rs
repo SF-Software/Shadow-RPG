@@ -45,7 +45,6 @@ impl Title {
         let title_image = images.join("title.jpg");
         let title_image = Texture::from_path(&title_image).unwrap();
 
-
         Title {
             state: State {
                 color: RED,
@@ -113,6 +112,7 @@ impl entity::Entity<State, RendererState, Input> for Title {
 
     fn process(&mut self, i: Input) {
         let (s, r, c) = Self::update(&self.state, &i);
-        self.rendererState = r;
+        self.state = s;
+        self.rendererState = r;
     }
 }
