@@ -12,3 +12,7 @@
 ## Music
 ### Theme Song
 ### Background Music
+
+## Fonts
+* Microsoft Yahei
+* Microsoft Yahei UI
