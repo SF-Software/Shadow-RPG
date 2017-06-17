@@ -1,5 +1,5 @@
-mod font;
-mod texture;
+pub mod font;
+pub mod texture;
 
 use lru_time_cache::LruCache;
 use std::cmp::Ord;

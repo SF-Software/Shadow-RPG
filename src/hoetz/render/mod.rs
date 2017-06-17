@@ -12,6 +12,9 @@ use sdl2::pixels::Color;
 use sdl2::ttf;
 use sdl2::ttf::{FontStyle, Sdl2TtfContext};
 
+use self::resource_manager::font::{GlyphDetails, FontDetails,GlyphManager,GlyphCreator};
+use self::resource_manager::texture::{TextureManager};
+
 use lru_time_cache::LruCache;
 
 macro_rules! rect(
@@ -20,26 +23,29 @@ macro_rules! rect(
     )
 );
 
-pub struct Renderer<'r> {
+pub struct Renderer<'l> {
     canvas: Canvas<Window>,
-    ttf_context: Sdl2TtfContext,
+    texture_manager: Option<TextureManager<'l,WindowContext>>,
+    glyph_manager: Option<GlyphManager<'l,WindowContext>>,
     texture_creator: TextureCreator<WindowContext>,
-    glyph_cache: LruCache<GlyphInfo, Texture<'r>>,
-    font_cache: LruCache<String, Font<'r, 'static>>,
-    image_cache: LruCache<String, Font<'r, 'static>>,
+    glyph_creator: Option<GlyphCreator<'l, WindowContext>>,
 }
 
-impl<'r> Renderer<'r> {
-    pub fn new(canvas: Canvas<Window>) -> Renderer<'r> {
+impl<'l> Renderer<'l> {
+    // unusable for now
+    pub fn new(canvas: Canvas<Window>) -> Renderer<'l> {
+        let texture_creator= canvas.texture_creator();
+        //let glyph_creator = GlyphCreator::new(ttf::init().unwrap(), &mut texture_creator);
 
-        Renderer {
-            ttf_context: ttf::init().unwrap(),
-            texture_creator: canvas.texture_creator(),
+        let mut s = Renderer {
             canvas: canvas,
-            glyph_cache: LruCache::with_capacity(3000),
-            font_cache: LruCache::with_capacity(5),
-            image_cache: LruCache::with_capacity(300),
-        }
+            texture_manager: None,//TextureManager::new(&mut texture_creator,300),
+            glyph_manager: None,//GlyphManager::new(&mut glyph_creator, 3000),
+            texture_creator: texture_creator,
+            glyph_creator: None,//glyph_creator,
+        };
+        s.glyph_creator =Some(GlyphCreator::new(ttf::init().unwrap(), &mut s.texture_creator));
+        s
     }
     pub fn render<F>(&mut self, mut f: F)
         where F: FnMut(&mut Renderer)
@@ -50,54 +56,13 @@ impl<'r> Renderer<'r> {
     }
 }
 
-#[derive(Clone)]
-struct GlyphInfo {
-    character: char,
-    font: String,
-    size: u32,
-    style: FontStyle,
-}
-impl PartialEq for GlyphInfo {
-    fn eq(&self, other: &GlyphInfo) -> bool {
-        self.character == other.character && self.font == other.font && self.size==other.size && self.style==other.style
-    }
-}
-impl Eq for GlyphInfo {}
-impl PartialOrd for GlyphInfo{
-    fn partial_cmp(&self, other :&GlyphInfo) -> Option<Ordering>{
-        Some(self.cmp(other))
-    }
-}
-impl Ord for GlyphInfo {
-    fn cmp(&self, other: &GlyphInfo) -> Ordering {
-        match self.font.cmp(&other.font) {
-            Ordering::Less => Ordering::Less,
-            Ordering::Greater => Ordering::Greater,
-            Ordering::Equal => {
-                match self.size.cmp(&other.size) {
-                    Ordering::Less => Ordering::Less,
-                    Ordering::Greater => Ordering::Greater,
-                    Ordering::Equal => {
-                        match self.style.cmp(&other.style) {
-                            Ordering::Less => Ordering::Less,
-                            Ordering::Greater => Ordering::Greater,
-                            Ordering::Equal => self.character.cmp(&other.character),
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+/*
 
-
-
-
-impl<'r> Renderer<'r> {
-    pub fn text(&'r mut  self,
+impl<'l,T> Renderer<'l,T> {
+    pub fn text(&'l mut  self,
                 s: String,
                 font: String,
-                size: u32,
+                size: u16,
                 x: i32,
                 y: i32,
                 color: Color,
@@ -112,12 +77,8 @@ impl<'r> Renderer<'r> {
                 r.set_y(b);
                 r.set_x(x);
             } else {
-                let g = GlyphInfo {
-                    font: font.clone(),
-                    size: size,
-                    character: ' ',
-                    style: style,
-                };
+                let g = GlyphDetails{font:FontDetails{path:font,size:size},character:c,style:style};
+               
                 if !self.glyph_cache.contains_key(&g) {
                     if !self.font_cache.contains_key(&font) {
                         let f = self.ttf_context
@@ -142,7 +103,7 @@ impl<'r> Renderer<'r> {
             }
         }
     }
-}
+}*/
 /*
 impl Renderer {
     pub fn image_from_file(&mut self, file: String, x: i32, y: i32) {

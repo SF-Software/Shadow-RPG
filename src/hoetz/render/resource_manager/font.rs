@@ -5,6 +5,7 @@ use sdl2::render::{TextureCreator, Texture};
 use sdl2::pixels::Color;
 
 pub type FontManager<'l> = ResourceManager<'l, FontDetails, Font<'l, 'static>, Sdl2TtfContext>;
+pub type GlyphManager<'l, T> = ResourceManager<'l, GlyphDetails, Texture<'l>, GlyphCreator<'l, T>>;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub struct FontDetails {
@@ -28,7 +29,7 @@ impl<'l> ResourceLoader<'l, Font<'l, 'static>> for Sdl2TtfContext {
     }
 }
 
-
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub struct GlyphDetails {
     pub font: FontDetails,
     pub character: char,
@@ -45,9 +46,17 @@ impl<'a> From<&'a GlyphDetails> for GlyphDetails {
     }
 }
 
-struct GlyphCreator<'l, T> {
+pub struct GlyphCreator<'l, T: 'l> {
     font_manager: FontManager<'l>,
-    texture_creator: TextureCreator<T>,
+    texture_creator: &'l TextureCreator<T>,
+}
+impl<'l, T: 'l> GlyphCreator<'l, T> {
+    pub fn new(context: Sdl2TtfContext, tc: &'l TextureCreator<T>) -> Self {
+        GlyphCreator {
+            font_manager: FontManager::new(&mut context, 5),
+            texture_creator: tc,
+        }
+    }
 }
 
 impl<'l, T> ResourceLoader<'l, Texture<'l>> for GlyphCreator<'l, T> {
