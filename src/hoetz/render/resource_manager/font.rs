@@ -51,9 +51,9 @@ pub struct GlyphCreator<'l, T: 'l> {
     texture_creator: &'l TextureCreator<T>,
 }
 impl<'l, T: 'l> GlyphCreator<'l, T> {
-    pub fn new(context: Sdl2TtfContext, tc: &'l TextureCreator<T>) -> Self {
+    pub fn new(context: &'l mut Sdl2TtfContext, tc: &'l TextureCreator<T>) -> Self {
         GlyphCreator {
-            font_manager: FontManager::new(&mut context, 5),
+            font_manager: FontManager::new(context, 5),
             texture_creator: tc,
         }
     }
