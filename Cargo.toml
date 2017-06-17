@@ -4,10 +4,5 @@ version = "0.1.0"
 authors = ["Joshua Astray <JoshuaSRKF@gmail.com>"]
 
 [dependencies]
-num-rational = "0.1.37"
+hoetz = { path = "./hoetz"}
 find_folder = "0.3.0"
-lru_time_cache = "0.6.0"
-[dependencies.sdl2]
-version = "0.30"
-default-features = false
-features = ["ttf","image","mixer"]

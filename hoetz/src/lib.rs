@@ -1,7 +1,10 @@
+extern crate sdl2;
+extern crate lru_time_cache;
+
 mod scene;
 mod render;
 
-
+/*
 
 use self::render::{Renderer, start as render_start};
 use self::scene::BoxedScene;
@@ -63,4 +66,6 @@ pub fn game_start(mut current_scene: BoxedScene, fps: u32) {
 
 
 }
+
+*/
 

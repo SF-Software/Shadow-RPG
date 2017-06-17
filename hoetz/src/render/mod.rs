@@ -47,9 +47,12 @@ impl<'l> Renderer<'l> {
     }
 }
   pub fn start<F: FnOnce(&mut Renderer)>(canvas: Canvas<Window>, callback: F) {
-        let mut texture_creator = RefCell::new(canvas.texture_creator());
-        let mut glyph_creator = GlyphCreator::new(&mut ttf::init().unwrap(), &texture_creator.borrow());
-        let mut r = Renderer::new(canvas, &mut texture_creator.borrow_mut(), &mut glyph_creator);
+        let texture_creator1 = canvas.texture_creator();
+        let mut texture_creator2 = canvas.texture_creator();
+        let mut ttf_context = ttf::init().unwrap();
+        let mut glyph_creator = GlyphCreator::new(&mut ttf_context, &texture_creator1);
+        let mut r = Renderer::new(canvas, &mut texture_creator2, &mut glyph_creator);
+        
         callback(&mut r);
     }
 

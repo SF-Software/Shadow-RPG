@@ -24,7 +24,7 @@ impl<'l, K, R, L> ResourceManager<'l, K, R, L>
             loader: loader,
         }
     }
-    pub fn get<D>(&'l mut self, details: &D) -> &R
+    pub fn get<D>(&mut self, details: &D) -> &R
         where L: ResourceLoader<'l, R, Args = D>,
               D: Ord + Clone,
               K: Borrow<D> + for<'a> From<&'a D>
