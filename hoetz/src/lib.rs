@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 extern crate sdl2;
 extern crate lru_time_cache;
 

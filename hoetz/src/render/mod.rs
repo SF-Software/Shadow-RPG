@@ -1,23 +1,17 @@
 pub mod text;
 mod resource_manager;
 
-use std::cmp::{Ord, Ordering};
-
-use std::path::Path;
 use sdl2::render::Canvas;
 use sdl2::video::{Window, WindowContext};
-use sdl2::render::{TextureCreator, Texture};
+use sdl2::render::TextureCreator;
 
 use sdl2::ttf;
 
 
-use self::resource_manager::font::{GlyphDetails, FontDetails, GlyphManager, GlyphCreator};
+use self::resource_manager::font::{GlyphManager, GlyphCreator};
 use self::resource_manager::texture::TextureManager;
 
-use lru_time_cache::LruCache;
 
-use std::cell::RefCell;
-use std::borrow::BorrowMut;
 
 pub struct Renderer<'l> {
     canvas: Canvas<Window>,
@@ -32,8 +26,8 @@ impl<'l> Renderer<'l> {
            -> Renderer<'l> {
         Renderer {
             canvas: canvas,
-            glyph_manager: GlyphManager::new(glyph_creator, 3000),
             texture_manager: TextureManager::new(texture_creator, 300),
+            glyph_manager: GlyphManager::new(glyph_creator, 3000),
         }
 
     }
@@ -47,13 +41,14 @@ impl<'l> Renderer<'l> {
     }
 }
   pub fn start<F: FnOnce(&mut Renderer)>(canvas: Canvas<Window>, callback: F) {
-        let texture_creator1 = canvas.texture_creator();
-        let mut texture_creator2 = canvas.texture_creator();
         let mut ttf_context = ttf::init().unwrap();
+        let texture_creator1 = canvas.texture_creator();
+        {
+        let mut texture_creator2 = canvas.texture_creator();
         let mut glyph_creator = GlyphCreator::new(&mut ttf_context, &texture_creator1);
         let mut r = Renderer::new(canvas, &mut texture_creator2, &mut glyph_creator);
-        
-        callback(&mut r);
+        }
+        //callback(&mut r);
     }
 
 /*

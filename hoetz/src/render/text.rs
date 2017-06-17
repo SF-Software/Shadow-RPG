@@ -2,7 +2,7 @@ use super::Renderer;
 use super::resource_manager::font::{GlyphDetails, FontDetails};
 use sdl2::rect::Rect;
 use sdl2::pixels::Color;
-use sdl2::ttf::{FontStyle, Sdl2TtfContext};
+use sdl2::ttf::FontStyle;
 use sdl2::render::TextureQuery;
 
 macro_rules! rect(
@@ -30,7 +30,7 @@ impl<'l> Renderer<'l> {
                 size: size,
             },
         };
-        let sfg = &mut self.glyph_manager;
+        // let sfg = &mut self.glyph_manager;
         for c in s.chars() {
             {
                 if c == '\n' {
@@ -38,7 +38,7 @@ impl<'l> Renderer<'l> {
                     r.set_y(b);
                     r.set_x(x);
                 } else {
-
+                    /*
                     g.character = c;
                     let texture = sfg.get(&g);
                     let TextureQuery {
@@ -49,9 +49,9 @@ impl<'l> Renderer<'l> {
                     } = texture.query();
                     r.set_width(w);
                     r.set_height(h);
-                    self.canvas.copy(texture, Option::None, r);
+                    self.canvas.copy(&texture, Option::None, r);
                     let rr = r.right();
-                    r.set_x(rr);
+                    r.set_x(rr);*/
                 }
             }
         }

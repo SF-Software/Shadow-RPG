@@ -7,7 +7,7 @@ pub type TextureManager<'l, T> = ResourceManager<'l, String, Texture<'l>, Textur
 // TextureCreator knows how to load Textures
 impl<'l, T> ResourceLoader<'l, Texture<'l>> for TextureCreator<T> {
     type Args = str;
-    fn load(&'l mut self, path: &str) -> Result<Texture, String> {
+    fn load(&'l self, path: &str) -> Result<Texture, String> {
         self.load_texture(path)
     }
 }
