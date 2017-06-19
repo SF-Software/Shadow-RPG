@@ -6,12 +6,11 @@ extern crate lru_time_cache;
 mod scene;
 mod render;
 
-/*
 
 use self::render::{Renderer, start as render_start};
 use self::scene::BoxedScene;
 
-use sdl2;
+
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::image::{INIT_PNG, INIT_JPG};
@@ -59,7 +58,11 @@ pub fn game_start(mut current_scene: BoxedScene, fps: u32) {
                          }
 
                          current_scene = update(current_scene);
-                         renderer.render(|r| current_scene.render_view(r));
+                         renderer.render(|r|{
+                             
+                             current_scene.render_view(r);
+                             }
+                             );
                          let now = Instant::now();
                          if next_render_step >= now {
                              sleep(next_render_step - now);
@@ -69,5 +72,5 @@ pub fn game_start(mut current_scene: BoxedScene, fps: u32) {
 
 }
 
-*/
+
 
