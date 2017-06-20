@@ -13,28 +13,25 @@ pub fn idc<T>(x: &T)->T
     x.clone()
 }
 
-pub struct TextureManager<'a, T> {
-    creator: TextureCreator<T>,
-    cache: RefCell<LruCache<String, Rc<Texture<'a>>>>,
+pub struct TextureManager<'r, T> where T:'r {
+    creator: &'r TextureCreator<T>,
+    cache: RefCell<LruCache<String, Rc<Texture<'r>>>>,
 }
 
-impl<'a, T> TextureManager<'a, T> {
-    pub fn new(creator: TextureCreator<T>) -> Self {
+impl<'r, T> TextureManager<'r, T> {
+    pub fn new(creator: &'r TextureCreator<T>) -> Self {
         Self {
             creator: creator,
             cache: RefCell::new(LruCache::with_capacity(500)),
         }
     }
-    pub fn get(&'a self, key: String) -> Rc<Texture> {
-        self.cache
-            .borrow_mut()
-            .get(&key)
-            .map_or_else(|| {
-                             let resource = Rc::new(self.creator.load_texture(format!("images/{}",&key)).unwrap());
-                             self.cache.borrow_mut().insert(key, resource.clone());
-                             resource
-                         },
-                         idc)
+    pub fn get(&self, key: String) -> Rc<Texture> {
+        let mut c =self.cache.borrow_mut();
+        if !c.contains_key(&key) {
+            let resource = Rc::new(self.creator.load_texture(format!("images/{}",&key)).unwrap());
+            c.insert(key.clone(), resource.clone());
+        }
+        c.get(&key).unwrap().clone()
     }
 }
 
@@ -48,18 +45,18 @@ pub struct FontDetails {
 
 
 
-pub struct FontManager<'ttf> {
-    creator: Sdl2TtfContext,
-    cache: RefCell<LruCache<FontDetails, Rc<RefCell<Font<'ttf, 'static>>>>>,
+pub struct FontManager<'r> {
+    creator: &'r Sdl2TtfContext,
+    cache: RefCell<LruCache<FontDetails, Rc<RefCell<Font<'r, 'static>>>>>,
 }
-impl<'ttf> FontManager<'ttf> {
-    pub fn new(creator: Sdl2TtfContext) -> Self {
+impl<'r> FontManager<'r> {
+    pub fn new(creator: &'r Sdl2TtfContext) -> Self {
         Self {
             creator: creator,
             cache: RefCell::new(LruCache::with_capacity(10)),
         }
     }
-    pub fn get(&'ttf self, key: FontDetails) -> Rc<RefCell<Font<'ttf,'static>>> {
+    pub fn get(&self, key: FontDetails) -> Rc<RefCell<Font<'r,'static>>> {
         let path = key.path.clone();
         let size = key.size;
         self.cache
@@ -75,20 +72,19 @@ impl<'ttf> FontManager<'ttf> {
    
 }
 
-pub struct GlyphCreator<'ttf, T> {
-    font_manager: FontManager<'ttf>,
-    texture_creator: TextureCreator<T>,
+pub struct GlyphCreator<'r, T:'r> {
+    font_manager: FontManager<'r>,
+    texture_creator: &'r TextureCreator<T>,
 }
-impl<'ttf, 'a, T> GlyphCreator<'ttf, T>
-    where 'a: 'ttf
+impl<'r, T> GlyphCreator<'r, T>
 {
-    pub fn new(context: Sdl2TtfContext, texture_creator: TextureCreator<T>) -> Self {
+    pub fn new(font_manager: FontManager<'r>, texture_creator: &'r TextureCreator<T>) -> Self {
         Self {
-            font_manager: FontManager::new(context),
+            font_manager: font_manager,
             texture_creator: texture_creator,
         }
     }
-    pub fn load_glyph(&'a self, details: &GlyphDetails) -> Result<Texture<'a>, String> {
+    pub fn load_glyph(&self, details: &GlyphDetails) -> Result<Texture<'r>, String> {
 
         let f = self.font_manager.get(details.font.clone());
         f.borrow_mut().set_style(details.style);
@@ -100,20 +96,19 @@ impl<'ttf, 'a, T> GlyphCreator<'ttf, T>
     }
 }
 
-pub struct GlyphManager<'ttf, 'a, T> {
-    creator: GlyphCreator<'ttf, T>,
-    cache: RefCell<LruCache<GlyphDetails, Rc<Texture<'a>>>>,
+pub struct GlyphManager<'r, T> where T:'r{
+    creator: GlyphCreator<'r, T>,
+    cache: RefCell<LruCache<GlyphDetails, Rc<Texture<'r>>>>,
 }
-impl<'ttf, 'a, T> GlyphManager<'ttf, 'a, T>
-    where 'a: 'ttf
+impl<'r, T> GlyphManager<'r, T>
 {
-    pub fn new(creator: GlyphCreator<'ttf, T>) -> Self {
+    pub fn new(creator: GlyphCreator<'r, T>) -> Self {
         GlyphManager {
             creator: creator,
             cache: RefCell::new(LruCache::with_capacity(2000)),
         }
     }
-    pub fn get(&'a self, key: GlyphDetails) -> Rc<Texture> {
+    pub fn get(&self, key: GlyphDetails) -> Rc<Texture> {
         self.cache
             .borrow_mut()
             .get(&key)

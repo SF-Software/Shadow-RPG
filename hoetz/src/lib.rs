@@ -3,8 +3,8 @@
 extern crate sdl2;
 extern crate lru_time_cache;
 
-mod scene;
-mod render;
+pub mod scene;
+pub mod render;
 
 
 use self::render::{Renderer, start as render_start};
@@ -58,11 +58,7 @@ pub fn game_start(mut current_scene: BoxedScene, fps: u32) {
                          }
 
                          current_scene = update(current_scene);
-                         renderer.render(|r|{
-                             
-                             current_scene.render_view(r);
-                             }
-                             );
+                         renderer.render(|r| { current_scene.render_view(r); });
                          let now = Instant::now();
                          if next_render_step >= now {
                              sleep(next_render_step - now);
@@ -71,6 +67,4 @@ pub fn game_start(mut current_scene: BoxedScene, fps: u32) {
 
 
 }
-
-
 

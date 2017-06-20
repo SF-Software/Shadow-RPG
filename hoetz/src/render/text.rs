@@ -10,8 +10,8 @@ macro_rules! rect(
         Rect::new($x as i32, $y as i32, $w as u32, $h as u32)
     )
 );
-
-impl<'l> Renderer<'l> {
+/*
+impl<'r1,'r2> Renderer<'r1,'r2> {
     pub fn text(&'l mut self,
                 s: String,
                 font: String,
@@ -59,3 +59,4 @@ impl<'l> Renderer<'l> {
     }
 }
 
+*/
