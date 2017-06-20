@@ -15,3 +15,4 @@
 
 ## Fonts
 * Arial
+* Noto Sans CJK

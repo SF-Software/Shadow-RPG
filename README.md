@@ -1,4 +1,4 @@
-# Shadow RPG (标题未定)
+# Shadow RPG (The Dreamer)
 
 ## Introduction
 在2017年的暑假，不来一起做些什么吗？
@@ -15,12 +15,12 @@
 * Shuenhoy
 
 ### Scriptwriter
-* Fuhei Cat (不知道腹黑猫干不干(逃
+* Fuhei Cat
 
 ### Illustrators
 * Maki
 * Misaki
-* Fuhei Cat (我也不知道腹黑猫干不干这个(逃
+* Fuhei Cat (不知道腹黑猫干不干这个(逃
 
 ## Story
 未定
