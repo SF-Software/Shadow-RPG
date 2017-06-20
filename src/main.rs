@@ -20,67 +20,69 @@ macro_rules! rect(
 );
 
 #[derive(Clone)]
-struct Model {}
+struct Model {
+    y: i32,
+    uptowards: bool,
+}
 fn init() -> (Model, Command) {
-    (Model {}, Command::None)
+    (Model {y:500, uptowards:false}, Command::None)
 }
 fn update(m: &Model, i: UIInput) -> (Model, Command) {
-    (m.clone(), Command::None)
+    let mut ny=m.y;
+    let mut up=m.uptowards;
+    if up {
+        ny-=2;
+    }else{
+        ny+=2;
+    }
+    if ny<450 || ny > 550{
+        up=!up;
+    }
+    (Model{y:ny,uptowards:up}, Command::None)
 }
 
-/*
- pub fn text(
-        &mut self,
-        s: String,
-        font: String,
-        size: u16,
-        x: i32,
-        y: i32,
-        color: Color,
-        style: FontStyle,
-    )
-*/
 fn view(m: &Model, r: &mut Renderer) {
+    let font = "NotoSansCJKtc-Regular.otf";
     r.image_from_file(String::from("title.jpg"), 0, 0);
     r.text(
         String::from("Start"),
-        String::from("arial.ttf"),
+        font,
         32,
         80,
-        350,
+        m.y,
         color_rgba!(255, 255, 255, 255),
         style::NORMAL,
     );
     r.text(
         String::from("Load"),
-        String::from("arial.ttf"),
+        font,
         32,
-        180,
-        350,
-        color_rgba!(255, 255, 255, 255),
+        280,
+        500,
+        color_rgba!(255, 255, 255, 128),
         style::NORMAL,
     );
     r.text(
         String::from("Setting"),
-        String::from("arial.ttf"),
+        font,
         32,
-        320,
-        350,
+        480,
+        500,
         color_rgba!(255, 255, 255, 255),
         style::NORMAL,
     );
     r.text(
         String::from("Exit"),
-        String::from("arial.ttf"),
+        font,
         32,
-        480,
-        350,
+        680,
+        500,
         color_rgba!(255, 255, 255, 255),
         style::NORMAL,
     );
 
 }
 fn main() {
-    hoetz::game_start(scene::new(init(), update, view), 60);
+    hoetz::game_start(800, 600, "The Dreamer".to_owned(),scene::new(init(), update, view), 60);
 
 }

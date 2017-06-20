@@ -7,7 +7,7 @@ pub mod scene;
 pub mod render;
 
 
-use self::render::{start as render_start};
+use self::render::start as render_start;
 use self::scene::BoxedScene;
 
 
@@ -26,11 +26,11 @@ fn update(mut scene: BoxedScene) -> BoxedScene {
 }
 
 
-pub fn game_start(mut current_scene: BoxedScene, fps: u32) {
+pub fn game_start(width: u32, height: u32, title: String, mut current_scene: BoxedScene, fps: u32) {
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
     let window = video_subsystem
-        .window("SDL2", 640, 480)
+        .window(&title, width, height)
         .position_centered()
         .build()
         .unwrap();
@@ -41,30 +41,30 @@ pub fn game_start(mut current_scene: BoxedScene, fps: u32) {
     let mut running = true;
 
 
-    let _ =
-        render_start(window.into_canvas().accelerated().build().unwrap(),
-                     |renderer| while running {
-                         let start = Instant::now();
-                         let next_render_step = start + ns_per_frame;
+    let _ = render_start(
+        window.into_canvas().accelerated().build().unwrap(),
+        |renderer| while running {
+            let start = Instant::now();
+            let next_render_step = start + ns_per_frame;
 
-                         for event in event_pump.poll_iter() {
-                             match event {
-                                 Event::Quit { .. } |
-                                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                                     running = false;
-                                 }
-                                 _ => {}
-                             }
-                         }
+            for event in event_pump.poll_iter() {
+                match event {
+                    Event::Quit { .. } |
+                    Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
+                        running = false;
+                    }
+                    _ => {}
+                }
+            }
 
-                         current_scene = update(current_scene);
-                         renderer.render(|r| { current_scene.render_view(r); });
-                         let now = Instant::now();
-                         if next_render_step >= now {
-                             sleep(next_render_step - now);
-                         }
-                     });
+            current_scene = update(current_scene);
+            renderer.render(|r| { current_scene.render_view(r); });
+            let now = Instant::now();
+            if next_render_step >= now {
+                sleep(next_render_step - now);
+            }
+        },
+    );
 
 
 }
-

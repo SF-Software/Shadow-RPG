@@ -4,6 +4,8 @@ use sdl2::rect::Rect;
 use sdl2::pixels::Color;
 use sdl2::ttf::FontStyle;
 use sdl2::render::TextureQuery;
+use std::path::Path;
+use std;
 pub mod style {
     use sdl2::ttf;
     use sdl2::ttf::FontStyle;
@@ -21,10 +23,10 @@ macro_rules! rect(
 );
 
 impl<'t> Renderer<'t> {
-    pub fn text(
+    pub fn text<'a>(
         &mut self,
         s: String,
-        font: String,
+        font: &'static str,
         size: u16,
         x: i32,
         y: i32,
@@ -41,6 +43,9 @@ impl<'t> Renderer<'t> {
                 size: size,
             },
         };
+        let off = if style.contains(style::ITALIC){
+            (std::f64::consts::PI/2.0-78.0/180.0*std::f64::consts::PI).tan()
+        }else{0.0};
         for c in s.chars() {
             if c == '\n' {
                 let b = r.bottom();
@@ -61,7 +66,8 @@ impl<'t> Renderer<'t> {
                 r.set_width(w);
                 r.set_height(h);
                 let _ = self.canvas.copy(&texture, Option::None, r);
-                let rr = r.right();
+                let off = (h as f64 * off) as i32;
+                let rr = r.right()-off;
                 r.set_x(rr);
             }
         }
