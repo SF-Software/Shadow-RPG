@@ -7,7 +7,7 @@ pub mod scene;
 pub mod render;
 
 
-use self::render::{Renderer, start as render_start};
+use self::render::{start as render_start};
 use self::scene::BoxedScene;
 
 
@@ -41,7 +41,7 @@ pub fn game_start(mut current_scene: BoxedScene, fps: u32) {
     let mut running = true;
 
 
-    let mut renderer =
+    let _ =
         render_start(window.into_canvas().accelerated().build().unwrap(),
                      |renderer| while running {
                          let start = Instant::now();

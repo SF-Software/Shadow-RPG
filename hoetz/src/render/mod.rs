@@ -1,17 +1,13 @@
 pub mod text;
 mod resource_manager;
-
-use sdl2::render::Canvas;
+use sdl2;
 use sdl2::video::{Window, WindowContext};
-use sdl2::render::{TextureCreator, TextureQuery};
-use sdl2::rect::Rect;
+use sdl2::render::{Canvas, TextureCreator, TextureQuery};
 use sdl2::ttf;
-use std::marker::PhantomData;
-macro_rules! rect(
-    ($x:expr, $y:expr, $w:expr, $h:expr) => (
-        Rect::new($x as i32, $y as i32, $w as u32, $h as u32)
-    )
-);
+
+pub type Color = sdl2::pixels::Color;
+pub type Rect = sdl2::rect::Rect;
+
 use self::resource_manager::{GlyphManager, FontManager, GlyphCreator, TextureManager};
 
 pub struct Renderer<'t> {
@@ -21,12 +17,14 @@ pub struct Renderer<'t> {
 }
 
 impl<'r, 't> Renderer<'t>
-    where 'r: 't
+where
+    'r: 't,
 {
-    fn new(canvas: Canvas<Window>,
-           texture_creator: &'r TextureCreator<WindowContext>,
-           glyph_creator: GlyphCreator<'t, WindowContext>)
-           -> Renderer<'t> {
+    fn new(
+        canvas: Canvas<Window>,
+        texture_creator: &'r TextureCreator<WindowContext>,
+        glyph_creator: GlyphCreator<'t, WindowContext>,
+    ) -> Renderer<'t> {
         Renderer {
             canvas: canvas,
             texture_manager: TextureManager::new(texture_creator),
@@ -35,8 +33,9 @@ impl<'r, 't> Renderer<'t>
 
     }
 
-    pub fn render<F>(&mut self, mut f: F)
-        where F: FnOnce(&mut Renderer)
+    pub fn render<F>(&mut self, f: F)
+    where
+        F: FnOnce(&mut Renderer),
     {
         self.canvas.clear();
 
@@ -64,7 +63,10 @@ impl<'t> Renderer<'t> {
             width: w,
             height: h,
         } = t.query();
-        self.canvas.copy(&t, None, rect!(x, y, w, h));
+        let _ = self.canvas.copy(
+            &t,
+            None,
+            Rect::new(x as i32, y as i32, w as u32, h as u32),
+        );
     }
 }
-
