@@ -4,10 +4,11 @@ extern crate sdl2;
 extern crate lru_time_cache;
 
 pub mod scene;
-pub mod render;
+pub mod context;
+pub mod graphics;
 pub mod event;
 
-use self::render::start as render_start;
+use self::graphics::start as graphics_start;
 use self::scene::BoxedScene;
 
 
@@ -41,9 +42,9 @@ pub fn game_start(width: u32, height: u32, title: String, mut current_scene: Box
     let mut running = true;
 
 
-    let _ = render_start(
+    let _ = graphics_start(
         window.into_canvas().accelerated().build().unwrap(),
-        |renderer| while running {
+        |graphics| while running {
             let start = Instant::now();
             let next_render_step = start + ns_per_frame;
 
@@ -58,7 +59,7 @@ pub fn game_start(width: u32, height: u32, title: String, mut current_scene: Box
             }
 
             current_scene = update(current_scene);
-            renderer.render(|r| { current_scene.render_view(r); });
+            graphics.render(|r| { current_scene.render_view(r); });
             let now = Instant::now();
             if next_render_step >= now {
                 sleep(next_render_step - now);

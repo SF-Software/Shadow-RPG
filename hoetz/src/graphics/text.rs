@@ -1,4 +1,4 @@
-use super::Renderer;
+use super::Graphics;
 use super::resource_manager::{GlyphDetails, FontDetails};
 use sdl2::rect::Rect;
 use sdl2::pixels::Color;
@@ -22,7 +22,7 @@ macro_rules! rect(
     )
 );
 
-impl<'t> Renderer<'t> {
+impl<'t> Graphics<'t> {
     pub fn text<'a>(
         &mut self,
         s: String,
