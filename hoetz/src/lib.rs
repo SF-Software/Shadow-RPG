@@ -3,6 +3,7 @@
 extern crate sdl2;
 extern crate lru_time_cache;
 
+pub mod helper;
 pub mod scene;
 pub mod context;
 pub mod graphics;

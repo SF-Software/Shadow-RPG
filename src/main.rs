@@ -7,7 +7,10 @@ use hoetz::scene;
 use hoetz::scene::Command;
 use hoetz::event::UIInput;
 use hoetz::context::Context;
+use hoetz::helper::query_texture;
 use hoetz::types::font::style;
+
+
 macro_rules! color_rgba(
     ($r:expr, $g:expr, $b:expr, $a:expr) => (
         hoetz::types::Color::RGBA($r as u8, $g as u8, $b as u8, $a as u8)
@@ -25,12 +28,14 @@ struct Model {
     y: i32,
     uptowards: bool,
 }
-fn init() -> (Model, Command) {
+
+fn init() -> (Model, (), Command) {
     (
         Model {
             y: 500,
             uptowards: false,
         },
+        (),
         Command::None,
     )
 }
@@ -54,11 +59,16 @@ fn update(m: &Model, i: &UIInput) -> (Model, Command) {
     )
 }
 
-fn view(m: &Model, r: &Context) {
+fn view(m: &Model, r: &(), c: &Context) {
     let font = "NotoSansCJKtc-Regular.otf";
-    r.image_from_file(String::from("title.jpg"), 0, 0);
-    r.text(
-        String::from("Start"),
+    c.image_from_file("title.jpg".to_owned(), 0, 0);
+    c.image_from_file_for("title.jpg".to_owned(), |canvas, texture| {
+        let texture = texture.borrow();
+        let (w, h) = query_texture(&texture);
+        canvas.borrow_mut().copy(&texture, None, rect!(10, 0, w, h));
+    });
+    c.text(
+        "Start".to_owned(),
         font,
         32,
         80,
@@ -66,8 +76,8 @@ fn view(m: &Model, r: &Context) {
         color_rgba!(255, 255, 255, 255),
         style::NORMAL,
     );
-    r.text(
-        String::from("Load"),
+    c.text(
+        "Load".to_owned(),
         font,
         32,
         280,
@@ -75,8 +85,8 @@ fn view(m: &Model, r: &Context) {
         color_rgba!(255, 255, 255, 128),
         style::NORMAL,
     );
-    r.text(
-        String::from("Settings"),
+    c.text(
+        "Settings".to_owned(),
         font,
         32,
         480,
@@ -84,8 +94,8 @@ fn view(m: &Model, r: &Context) {
         color_rgba!(255, 255, 255, 255),
         style::NORMAL,
     );
-    r.text(
-        String::from("Exit"),
+    c.text(
+        "Exit".to_owned(),
         font,
         32,
         680,
@@ -100,7 +110,7 @@ fn main() {
         800,
         600,
         "The Dreamer".to_owned(),
-        scene::new(init(), update, view),
+        scene::new(init, update, view),
         60,
     );
 

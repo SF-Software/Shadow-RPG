@@ -6,8 +6,9 @@ pub enum Command {
     SceneChange(BoxedScene),
 }
 
+pub type Init<M, R> = (fn() -> (M, R, Command));
 pub type Update<M> = (fn(&M, &UIInput) -> (M, Command));
-pub type ViewRenderer<M> = fn(&M, &Context);
+pub type ViewRenderer<M, R> = fn(&M, &R, &Context);
 
 
 
@@ -19,10 +20,11 @@ pub trait Scene {
 
 pub type BoxedScene = Box<Scene>;
 
-pub struct SceneEntity<M> {
+pub struct SceneEntity<M, R> {
     upda: Update<M>,
-    view_renderer: ViewRenderer<M>,
+    view_renderer: ViewRenderer<M, R>,
     model: M,
+    resource: R,
 }
 
 fn process_command(c: Command) -> Option<BoxedScene> {
@@ -32,7 +34,7 @@ fn process_command(c: Command) -> Option<BoxedScene> {
     }
 }
 
-impl<M> Scene for SceneEntity<M> {
+impl<M, R> Scene for SceneEntity<M, R> {
     fn update(&mut self, input: &UIInput) -> Option<BoxedScene> {
         let update = self.upda;
         let (m, c) = update(&self.model, input);
@@ -41,21 +43,22 @@ impl<M> Scene for SceneEntity<M> {
     }
     fn render_view(&self, context: &Context) {
         let vr = self.view_renderer;
-        vr(&self.model, context);
+        vr(&self.model, &self.resource, context);
     }
 }
 
 
 
-pub fn new<M>(
-    init: (M, Command),
+pub fn new<M, R>(
+    init: Init<M, R>,
     update: Update<M>,
-    view_renderer: ViewRenderer<M>,
-) -> Box<SceneEntity<M>> {
-    let (m, c) = init;
+    view_renderer: ViewRenderer<M, R>,
+) -> Box<SceneEntity<M, R>> {
+    let (m, r, c) = init();
     process_command(c);
     Box::new(SceneEntity {
         model: m,
+        resource: r,
         upda: update,
         view_renderer: view_renderer,
     })

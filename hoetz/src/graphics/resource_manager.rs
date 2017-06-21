@@ -5,7 +5,7 @@ use std::cell::RefCell;
 use sdl2::image::LoadTexture;
 use sdl2::render::{TextureCreator, Texture};
 use std::rc::Rc;
-use types::font::{FontDetails, GlyphDetails};
+use types::font::{FontDetails, GlyphDetails, FontStyle};
 
 pub fn idc<T>(x: &T) -> T
 where
@@ -19,7 +19,7 @@ where
     T: 'r,
 {
     creator: &'r TextureCreator<T>,
-    cache: RefCell<LruCache<String, Rc<Texture<'r>>>>,
+    cache: RefCell<LruCache<String, Rc<RefCell<Texture<'r>>>>>,
 }
 
 impl<'r, T> TextureManager<'r, T> {
@@ -29,14 +29,14 @@ impl<'r, T> TextureManager<'r, T> {
             cache: RefCell::new(LruCache::with_capacity(500)),
         }
     }
-    pub fn get(&self, key: String) -> Rc<Texture> {
+    pub fn get(&self, key: String) -> Rc<RefCell<Texture<'r>>> {
         let mut c = self.cache.borrow_mut();
         if !c.contains_key(&key) {
-            let resource = Rc::new(
+            let resource = Rc::new(RefCell::new(
                 self.creator
                     .load_texture(format!("images/{}", &key))
                     .unwrap(),
-            );
+            ));
             c.insert(key.clone(), resource.clone());
         }
         c.get(&key).unwrap().clone()
@@ -97,6 +97,21 @@ impl<'r, T> GlyphCreator<'r, T> {
         let t = self.texture_creator.create_texture_from_surface(s).unwrap();
         Ok(t)
     }
+    pub fn load_string(
+        &self,
+        text: String,
+        style: FontStyle,
+        font: FontDetails,
+    ) -> Result<Texture<'r>, String> {
+        let f = self.font_manager.get(font);
+        let mut f = f.borrow_mut();
+        f.set_style(style);
+        let s = f.render(&text)
+            .blended(Color::RGBA(255, 255, 255, 255))
+            .unwrap();
+        let t = self.texture_creator.create_texture_from_surface(s).unwrap();
+        Ok(t)
+    }
 }
 
 pub struct GlyphManager<'r, T>
@@ -120,5 +135,15 @@ impl<'r, T> GlyphManager<'r, T> {
             c.insert(key.clone(), resource.clone());
         }
         c.get(&key).unwrap().clone()
+    }
+    pub fn get_string(
+        &self,
+        text: String,
+        style: FontStyle,
+        font: FontDetails,
+    ) -> Rc<RefCell<Texture<'r>>> {
+        Rc::new(RefCell::new(
+            self.creator.load_string(text, style, font).unwrap(),
+        ))
     }
 }

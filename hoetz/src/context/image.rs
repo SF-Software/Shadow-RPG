@@ -1,12 +1,16 @@
-
-use sdl2::render::TextureQuery;
+use sdl2::video::Window;
+use sdl2::render::{TextureQuery, Canvas, Texture};
 use super::Context;
 use types::Rect;
+use std::cell::RefCell;
+
 
 impl<'a, 'b> Context<'a, 'b> {
     pub fn image_from_file(&self, file: String, x: i32, y: i32) {
         let t = self.graphics.texture_manager.borrow_mut();
         let t = t.get(file);
+        let t = t.borrow();
+
         let TextureQuery {
             access: _,
             format: _,
@@ -23,5 +27,13 @@ impl<'a, 'b> Context<'a, 'b> {
                 h as u32,
             ),
         );
+    }
+    pub fn image_from_file_for<F>(&self, file: String, callback: F)
+    where
+        F: FnOnce(&RefCell<Canvas<Window>>, &RefCell<Texture>),
+    {
+        let t = self.graphics.texture_manager.borrow_mut();
+        let t = t.get(file);
+        callback(&self.graphics.canvas, &t);
     }
 }
