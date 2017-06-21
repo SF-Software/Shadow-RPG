@@ -38,7 +38,6 @@ where
         F: FnOnce(&mut Renderer),
     {
         self.canvas.clear();
-
         f(self);
         self.canvas.present();
     }

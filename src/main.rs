@@ -4,7 +4,8 @@
 
 extern crate hoetz;
 use hoetz::scene;
-use hoetz::scene::{Command, UIInput};
+use hoetz::scene::Command;
+use hoetz::scene::event::UIInput;
 use hoetz::render::Renderer;
 use hoetz::render::text::style;
 macro_rules! color_rgba(
@@ -25,20 +26,32 @@ struct Model {
     uptowards: bool,
 }
 fn init() -> (Model, Command) {
-    (Model {y:500, uptowards:false}, Command::None)
+    (
+        Model {
+            y: 500,
+            uptowards: false,
+        },
+        Command::None,
+    )
 }
 fn update(m: &Model, i: UIInput) -> (Model, Command) {
-    let mut ny=m.y;
-    let mut up=m.uptowards;
+    let mut ny = m.y;
+    let mut up = m.uptowards;
     if up {
-        ny-=2;
-    }else{
-        ny+=2;
+        ny -= 2;
+    } else {
+        ny += 2;
     }
-    if ny<450 || ny > 550{
-        up=!up;
+    if ny < 450 || ny > 550 {
+        up = !up;
     }
-    (Model{y:ny,uptowards:up}, Command::None)
+    (
+        Model {
+            y: ny,
+            uptowards: up,
+        },
+        Command::None,
+    )
 }
 
 fn view(m: &Model, r: &mut Renderer) {
@@ -83,6 +96,12 @@ fn view(m: &Model, r: &mut Renderer) {
 
 }
 fn main() {
-    hoetz::game_start(800, 600, "The Dreamer".to_owned(),scene::new(init(), update, view), 60);
+    hoetz::game_start(
+        800,
+        600,
+        "The Dreamer".to_owned(),
+        scene::new(init(), update, view),
+        60,
+    );
 
 }

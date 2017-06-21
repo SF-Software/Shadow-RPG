@@ -43,9 +43,11 @@ impl<'t> Renderer<'t> {
                 size: size,
             },
         };
-        let off = if style.contains(style::ITALIC){
-            (std::f64::consts::PI/2.0-78.0/180.0*std::f64::consts::PI).tan()
-        }else{0.0};
+        let off = if style.contains(style::ITALIC) {
+            (std::f64::consts::PI / 2.0 - 78.0 / 180.0 * std::f64::consts::PI).tan()
+        } else {
+            0.0
+        };
         for c in s.chars() {
             if c == '\n' {
                 let b = r.bottom();
@@ -67,7 +69,7 @@ impl<'t> Renderer<'t> {
                 r.set_height(h);
                 let _ = self.canvas.copy(&texture, Option::None, r);
                 let off = (h as f64 * off) as i32;
-                let rr = r.right()-off;
+                let rr = r.right() - off;
                 r.set_x(rr);
             }
         }

@@ -5,7 +5,7 @@ extern crate lru_time_cache;
 
 pub mod scene;
 pub mod render;
-
+pub mod event;
 
 use self::render::start as render_start;
 use self::scene::BoxedScene;
@@ -16,10 +16,10 @@ use sdl2::keyboard::Keycode;
 use sdl2::image::{INIT_PNG, INIT_JPG};
 use std::time::{Duration, Instant};
 use std::thread::sleep;
-use self::scene::UIInput;
+use self::event::UIInput;
 
 fn update(mut scene: BoxedScene) -> BoxedScene {
-    match scene.update(UIInput {}) {
+    match scene.update(&UIInput {}) {
         Some(s) => s,
         None => scene,
     }
