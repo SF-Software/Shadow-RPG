@@ -1,4 +1,4 @@
-use super::graphics::Graphics;
+use super::context::Context;
 use super::event::UIInput;
 
 pub enum Command {
@@ -7,14 +7,14 @@ pub enum Command {
 }
 
 pub type Update<M> = (fn(&M, &UIInput) -> (M, Command));
-pub type ViewRenderer<M> = fn(&M, &mut Graphics);
+pub type ViewRenderer<M> = fn(&M, &Context);
 
 
 
 
 pub trait Scene {
     fn update(&mut self, &UIInput) -> Option<BoxedScene>;
-    fn render_view(&self, &mut Graphics);
+    fn render_view(&self, &Context);
 }
 
 pub type BoxedScene = Box<Scene>;
@@ -39,9 +39,9 @@ impl<M> Scene for SceneEntity<M> {
         self.model = m;
         process_command(c)
     }
-    fn render_view(&self, renderer: &mut Graphics) {
+    fn render_view(&self, context: &Context) {
         let vr = self.view_renderer;
-        vr(&self.model, renderer);
+        vr(&self.model, context);
     }
 }
 

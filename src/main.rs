@@ -6,17 +6,17 @@ extern crate hoetz;
 use hoetz::scene;
 use hoetz::scene::Command;
 use hoetz::event::UIInput;
-use hoetz::graphics::Graphics;
-use hoetz::graphics::text::style;
+use hoetz::context::Context;
+use hoetz::types::font::style;
 macro_rules! color_rgba(
     ($r:expr, $g:expr, $b:expr, $a:expr) => (
-        hoetz::graphics::Color::RGBA($r as u8, $g as u8, $b as u8, $a as u8)
+        hoetz::types::Color::RGBA($r as u8, $g as u8, $b as u8, $a as u8)
     )
 );
 
 macro_rules! rect(
     ($x:expr, $y:expr, $w:expr, $h:expr) => (
-       hoetz::graphics::Rect::new($x as i32, $y as i32, $w as u32, $h as u32)
+       hoetz::types::Rect::new($x as i32, $y as i32, $w as u32, $h as u32)
     )
 );
 
@@ -54,7 +54,7 @@ fn update(m: &Model, i: &UIInput) -> (Model, Command) {
     )
 }
 
-fn view(m: &Model, r: &mut Graphics) {
+fn view(m: &Model, r: &Context) {
     let font = "NotoSansCJKtc-Regular.otf";
     r.image_from_file(String::from("title.jpg"), 0, 0);
     r.text(

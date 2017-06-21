@@ -5,7 +5,7 @@ use std::cell::RefCell;
 use sdl2::image::LoadTexture;
 use sdl2::render::{TextureCreator, Texture};
 use std::rc::Rc;
-use std::path::Path;
+use types::font::{FontDetails, GlyphDetails};
 
 pub fn idc<T>(x: &T) -> T
 where
@@ -43,14 +43,8 @@ impl<'r, T> TextureManager<'r, T> {
     }
 }
 
-use sdl2::ttf::{FontStyle, Sdl2TtfContext, Font};
+use sdl2::ttf::{Sdl2TtfContext, Font};
 use sdl2::pixels::Color;
-#[derive(PartialEq, Eq, PartialOrd, Ord, Clone)]
-pub struct FontDetails {
-    pub size: u16,
-    pub path: &'static str,
-}
-
 
 
 pub struct FontManager<'r> {
@@ -127,11 +121,4 @@ impl<'r, T> GlyphManager<'r, T> {
         }
         c.get(&key).unwrap().clone()
     }
-}
-
-#[derive(PartialEq, Eq, PartialOrd, Ord, Clone)]
-pub struct GlyphDetails {
-    pub character: char,
-    pub style: FontStyle,
-    pub font: FontDetails,
 }

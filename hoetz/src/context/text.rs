@@ -1,30 +1,21 @@
-use super::Graphics;
-use super::resource_manager::{GlyphDetails, FontDetails};
-use sdl2::rect::Rect;
+use super::Context;
+
 use sdl2::pixels::Color;
 use sdl2::ttf::FontStyle;
 use sdl2::render::TextureQuery;
-use std::path::Path;
+use types::Rect;
+use types::font::{GlyphDetails, FontDetails, style};
 use std;
-pub mod style {
-    use sdl2::ttf;
-    use sdl2::ttf::FontStyle;
 
-    pub const NORMAL: FontStyle = ttf::STYLE_NORMAL;
-    pub const BOLD: FontStyle = ttf::STYLE_BOLD;
-    pub const ITALIC: FontStyle = ttf::STYLE_ITALIC;
-    pub const UNDERLINE: FontStyle = ttf::STYLE_UNDERLINE;
-    pub const STRIKETHROUGH: FontStyle = ttf::STYLE_STRIKETHROUGH;
-}
 macro_rules! rect(
     ($x:expr, $y:expr, $w:expr, $h:expr) => (
         Rect::new($x as i32, $y as i32, $w as u32, $h as u32)
     )
 );
 
-impl<'t> Graphics<'t> {
-    pub fn text<'a>(
-        &mut self,
+impl<'a, 'b> Context<'a, 'b> {
+    pub fn text(
+        &self,
         s: String,
         font: &'static str,
         size: u16,
@@ -55,7 +46,7 @@ impl<'t> Graphics<'t> {
                 r.set_x(x);
             } else {
                 g.character = c;
-                let texture = self.glyph_manager.get(g.clone());
+                let texture = self.graphics.glyph_manager.borrow_mut().get(g.clone());
                 let mut texture = texture.borrow_mut();
                 texture.set_color_mod(color.r, color.g, color.b);
                 texture.set_alpha_mod(color.a);
@@ -67,7 +58,11 @@ impl<'t> Graphics<'t> {
                 } = texture.query();
                 r.set_width(w);
                 r.set_height(h);
-                let _ = self.canvas.copy(&texture, Option::None, r);
+                let _ = self.graphics.canvas.borrow_mut().copy(
+                    &texture,
+                    Option::None,
+                    r,
+                );
                 let off = (h as f64 * off) as i32;
                 let rr = r.right() - off;
                 r.set_x(rr);

@@ -7,10 +7,11 @@ pub mod scene;
 pub mod context;
 pub mod graphics;
 pub mod event;
+pub mod types;
 
 use self::graphics::start as graphics_start;
 use self::scene::BoxedScene;
-
+use self::context::Context;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -44,25 +45,28 @@ pub fn game_start(width: u32, height: u32, title: String, mut current_scene: Box
 
     let _ = graphics_start(
         window.into_canvas().accelerated().build().unwrap(),
-        |graphics| while running {
-            let start = Instant::now();
-            let next_render_step = start + ns_per_frame;
+        |graphics| {
+            let c = Context::new(graphics);
+            while running {
+                let start = Instant::now();
+                let next_render_step = start + ns_per_frame;
 
-            for event in event_pump.poll_iter() {
-                match event {
-                    Event::Quit { .. } |
-                    Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                        running = false;
+                for event in event_pump.poll_iter() {
+                    match event {
+                        Event::Quit { .. } |
+                        Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
+                            running = false;
+                        }
+                        _ => {}
                     }
-                    _ => {}
                 }
-            }
 
-            current_scene = update(current_scene);
-            graphics.render(|r| { current_scene.render_view(r); });
-            let now = Instant::now();
-            if next_render_step >= now {
-                sleep(next_render_step - now);
+                current_scene = update(current_scene);
+                graphics.render(|| { current_scene.render_view(&c); });
+                let now = Instant::now();
+                if next_render_step >= now {
+                    sleep(next_render_step - now);
+                }
             }
         },
     );
