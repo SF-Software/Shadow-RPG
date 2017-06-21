@@ -76,7 +76,7 @@ fn view(m: &Model, r: &mut Graphics) {
         style::NORMAL,
     );
     r.text(
-        String::from("Setting"),
+        String::from("Settings"),
         font,
         32,
         480,
