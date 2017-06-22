@@ -1,7 +1,7 @@
 use sdl2;
 pub type Color = sdl2::pixels::Color;
 pub type Rect = sdl2::rect::Rect;
-
+pub type Point = sdl2::rect::Point;
 
 pub mod font {
     use sdl2;

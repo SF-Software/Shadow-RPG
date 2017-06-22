@@ -9,7 +9,7 @@ use hoetz::event::UIInput;
 use hoetz::context::Context;
 use hoetz::helper::query_texture;
 use hoetz::types::font::style;
-
+use hoetz::context::image::CopyAttribute;
 
 macro_rules! color_rgba(
     ($r:expr, $g:expr, $b:expr, $a:expr) => (
@@ -62,10 +62,17 @@ fn update(m: &Model, i: &UIInput) -> (Model, Command) {
 fn view(m: &Model, r: &(), c: &Context) {
     let font = "NotoSansCJKtc-Regular.otf";
     c.image_from_file("title.jpg".to_owned(), 0, 0);
-    c.image_from_file_for("title.jpg".to_owned(), |canvas, texture| {
-        let texture = texture.borrow();
-        let (w, h) = query_texture(&texture);
-        canvas.borrow_mut().copy(&texture, None, rect!(10, 0, w, h));
+
+    c.get_canvas(|canvas| {
+        let t = c.get_image_from_file("title.jpg".to_owned());
+        let t = t.borrow();
+        let (w, h) = query_texture(&t);
+        canvas.borrow_mut().copy(&t, None, rect!(10, 0, w, h));
+    });
+    c.image_from_file_ex("title.jpg".to_owned(), |c, w, h| {
+        c.pos(20, 20)
+            .dst_size((w as f64 * 0.5) as u32, h)
+            .angle(3.14 / 4.0)
     });
     c.text(
         "Start".to_owned(),
