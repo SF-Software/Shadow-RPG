@@ -1,9 +1,12 @@
 
 mod resource_manager;
-use sdl2::video::{Window, WindowContext};
-use sdl2::render::{Canvas, TextureCreator};
+
+
 use sdl2::ttf;
 use std::cell::RefCell;
+use sdl2::video::{Window, WindowContext};
+use sdl2::render::{Canvas, TextureCreator};
+
 
 use self::resource_manager::{GlyphManager, FontManager, GlyphCreator, TextureManager};
 

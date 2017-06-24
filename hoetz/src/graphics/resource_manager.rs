@@ -1,10 +1,10 @@
 
-use lru_time_cache::LruCache;
 
+use std::rc::Rc;
 use std::cell::RefCell;
 use sdl2::image::LoadTexture;
+use lru_time_cache::LruCache;
 use sdl2::render::{TextureCreator, Texture};
-use std::rc::Rc;
 use types::font::{FontDetails, GlyphDetails, FontStyle};
 
 pub fn idc<T>(x: &T) -> T

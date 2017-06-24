@@ -10,16 +10,18 @@ pub mod graphics;
 pub mod event;
 pub mod types;
 
-use self::graphics::start as graphics_start;
-use self::scene::BoxedScene;
+
 use self::context::Context;
+use self::scene::BoxedScene;
+use self::context::ResourceContext;
+use self::graphics::start as graphics_start;
 
 use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
-use sdl2::image::{INIT_PNG, INIT_JPG};
-use std::time::{Duration, Instant};
 use std::thread::sleep;
 use self::event::UIInput;
+use sdl2::keyboard::Keycode;
+use std::time::{Duration, Instant};
+use sdl2::image::{INIT_PNG, INIT_JPG};
 
 fn update(mut scene: BoxedScene) -> BoxedScene {
     match scene.update(&UIInput {}) {
@@ -48,6 +50,7 @@ pub fn game_start(width: u32, height: u32, title: String, mut current_scene: Box
         window.into_canvas().accelerated().build().unwrap(),
         |graphics| {
             let c = Context::new(graphics);
+            let rc = ResourceContext::new(graphics);
             while running {
                 let start = Instant::now();
                 let next_render_step = start + ns_per_frame;
@@ -61,7 +64,7 @@ pub fn game_start(width: u32, height: u32, title: String, mut current_scene: Box
                         _ => {}
                     }
                 }
-
+                current_scene.resource_load(&rc);
                 current_scene = update(current_scene);
                 graphics.render(|| { current_scene.render_view(&c); });
                 let now = Instant::now();

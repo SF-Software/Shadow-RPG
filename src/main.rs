@@ -6,7 +6,7 @@ extern crate hoetz;
 use hoetz::scene;
 use hoetz::scene::Command;
 use hoetz::event::UIInput;
-use hoetz::context::Context;
+use hoetz::context::{Context, ResourceContext};
 use hoetz::helper::query_texture;
 use hoetz::types::font::style;
 use hoetz::context::image::CopyAttribute;
@@ -29,15 +29,17 @@ struct Model {
     uptowards: bool,
 }
 
-fn init() -> (Model, (), Command) {
+fn init(args: ()) -> (Model, Command) {
     (
         Model {
             y: 500,
             uptowards: false,
         },
-        (),
         Command::None,
     )
+}
+fn resource_loader(m: &Model, context: &ResourceContext) -> () {
+    ()
 }
 fn update(m: &Model, i: &UIInput) -> (Model, Command) {
     let mut ny = m.y;
@@ -117,7 +119,7 @@ fn main() {
         800,
         600,
         "The Dreamer".to_owned(),
-        scene::new(init, update, view),
+        scene::new((), init, resource_loader, update, view),
         60,
     );
 

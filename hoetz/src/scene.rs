@@ -1,12 +1,14 @@
-use super::context::Context;
 use super::event::UIInput;
+use super::context::{Context, ResourceContext};
+
 
 pub enum Command {
     None,
     SceneChange(BoxedScene),
 }
 
-pub type Init<M, R> = (fn() -> (M, R, Command));
+pub type Init<M, A> = (fn(A) -> (M, Command));
+pub type ResourceLoad<M, R> = fn(&M, &ResourceContext) -> R;
 pub type Update<M> = (fn(&M, &UIInput) -> (M, Command));
 pub type ViewRenderer<M, R> = fn(&M, &R, &Context);
 
@@ -16,15 +18,17 @@ pub type ViewRenderer<M, R> = fn(&M, &R, &Context);
 pub trait Scene {
     fn update(&mut self, &UIInput) -> Option<BoxedScene>;
     fn render_view(&self, &Context);
+    fn resource_load(&mut self, &ResourceContext);
 }
 
 pub type BoxedScene = Box<Scene>;
 
 pub struct SceneEntity<M, R> {
     upda: Update<M>,
+    resource_loader: ResourceLoad<M, R>,
     view_renderer: ViewRenderer<M, R>,
     model: M,
-    resource: R,
+    resource: Option<R>,
 }
 
 fn process_command(c: Command) -> Option<BoxedScene> {
@@ -35,6 +39,12 @@ fn process_command(c: Command) -> Option<BoxedScene> {
 }
 
 impl<M, R> Scene for SceneEntity<M, R> {
+    fn resource_load(&mut self, context: &ResourceContext) {
+        if let None = self.resource {
+            let rld = self.resource_loader;
+            self.resource = Some(rld(&self.model, context));
+        }
+    }
     fn update(&mut self, input: &UIInput) -> Option<BoxedScene> {
         let update = self.upda;
         let (m, c) = update(&self.model, input);
@@ -43,22 +53,28 @@ impl<M, R> Scene for SceneEntity<M, R> {
     }
     fn render_view(&self, context: &Context) {
         let vr = self.view_renderer;
-        vr(&self.model, &self.resource, context);
+        if let Some(ref r) = self.resource {
+            vr(&self.model, &r, context);
+        }
+
     }
 }
 
 
 
-pub fn new<M, R>(
-    init: Init<M, R>,
+pub fn new<M, A, R>(
+    args: A,
+    init: Init<M, A>,
+    resource_loader: ResourceLoad<M, R>,
     update: Update<M>,
     view_renderer: ViewRenderer<M, R>,
 ) -> Box<SceneEntity<M, R>> {
-    let (m, r, c) = init();
+    let (m, c) = init(args);
     process_command(c);
     Box::new(SceneEntity {
         model: m,
-        resource: r,
+        resource: None,
+        resource_loader: resource_loader,
         upda: update,
         view_renderer: view_renderer,
     })

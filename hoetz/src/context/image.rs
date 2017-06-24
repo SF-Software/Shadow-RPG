@@ -1,8 +1,8 @@
-use sdl2::render::{TextureQuery, Texture};
-use super::Context;
-use types::{Rect, Color, Point};
-use std::cell::RefCell;
 use std::rc::Rc;
+use std::cell::RefCell;
+use types::{Rect, Color, Point};
+use super::{Context, ResourceContext};
+use sdl2::render::{TextureQuery, Texture};
 
 pub struct CopyAttribute {
     x: i32,
@@ -148,6 +148,13 @@ impl<'a, 'b> Context<'a, 'b> {
         );
     }
     pub fn get_image_from_file(&self, file: String) -> Rc<RefCell<Texture<'b>>> {
+        let t = self.graphics.texture_manager.borrow_mut();
+        let t = t.get(file);
+        t
+    }
+}
+impl<'a, 'b> ResourceContext<'a, 'b> {
+    pub fn image_from_file(&self, file: String) -> Rc<RefCell<Texture<'b>>> {
         let t = self.graphics.texture_manager.borrow_mut();
         let t = t.get(file);
         t

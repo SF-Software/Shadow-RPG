@@ -1,30 +1,28 @@
-use super::Context;
-use sdl2::render::{TextureQuery, Canvas, Texture};
+use std;
+use types::Rect;
+use std::rc::Rc;
+use std::cell::RefCell;
 use sdl2::pixels::Color;
 use sdl2::ttf::FontStyle;
-use types::Rect;
+use super::{Context, ResourceContext};
+use sdl2::render::{TextureQuery, Texture};
 use types::font::{GlyphDetails, FontDetails, style};
-use std;
-use std::cell::RefCell;
-use sdl2::video::Window;
+
+
 macro_rules! rect(
     ($x:expr, $y:expr, $w:expr, $h:expr) => (
         Rect::new($x as i32, $y as i32, $w as u32, $h as u32)
     )
 );
-
-impl<'a, 'b> Context<'a, 'b> {
-    pub fn text_for<F>(
+impl<'a, 'b> ResourceContext<'a, 'b> {
+    pub fn get_text(
         &self,
         s: String,
         font: &'static str,
         size: u16,
         color: Color,
         style: FontStyle,
-        callback: F,
-    ) where
-        F: FnOnce(&RefCell<Canvas<Window>>, &RefCell<Texture>),
-    {
+    ) -> Rc<RefCell<Texture<'b>>> {
         let f = FontDetails {
             path: font,
             size: size,
@@ -36,8 +34,30 @@ impl<'a, 'b> Context<'a, 'b> {
             tt.set_color_mod(color.r, color.g, color.b);
             tt.set_alpha_mod(color.a);
         }
-
-        callback(&self.graphics.canvas, &t);
+        t
+    }
+}
+impl<'a, 'b> Context<'a, 'b> {
+    pub fn get_text(
+        &self,
+        s: String,
+        font: &'static str,
+        size: u16,
+        color: Color,
+        style: FontStyle,
+    ) -> Rc<RefCell<Texture<'b>>> {
+        let f = FontDetails {
+            path: font,
+            size: size,
+        };
+        let gm = self.graphics.glyph_manager.borrow();
+        let t = gm.get_string(s, style, f);
+        {
+            let mut tt = t.borrow_mut();
+            tt.set_color_mod(color.r, color.g, color.b);
+            tt.set_alpha_mod(color.a);
+        }
+        t
     }
     pub fn text(
         &self,

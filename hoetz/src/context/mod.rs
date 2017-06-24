@@ -1,8 +1,9 @@
 pub mod image;
 pub mod text;
+
+use std::cell::RefCell;
 use sdl2::video::Window;
 use sdl2::render::Canvas;
-use std::cell::RefCell;
 use super::graphics::Graphics;
 
 
@@ -22,5 +23,18 @@ impl<'a, 'b> Context<'a, 'b> {
         F: FnOnce(&RefCell<Canvas<Window>>),
     {
         callback(&self.graphics.canvas);
+    }
+}
+
+pub struct ResourceContext<'a, 'b>
+where
+    'b: 'a,
+{
+    graphics: &'a Graphics<'b>,
+}
+
+impl<'a, 'b> ResourceContext<'a, 'b> {
+    pub fn new(graphics: &'a Graphics<'b>) -> ResourceContext<'a, 'b> {
+        Self { graphics: graphics }
     }
 }
