@@ -3,6 +3,10 @@ pub type Color = sdl2::pixels::Color;
 pub type Rect = sdl2::rect::Rect;
 pub type Point = sdl2::rect::Point;
 
+
+pub type MouseState = sdl2::mouse::MouseState;
+pub use sdl2::keyboard::Keycode as KeyCode;
+
 pub mod font {
     use sdl2;
     pub type FontStyle = sdl2::ttf::FontStyle;

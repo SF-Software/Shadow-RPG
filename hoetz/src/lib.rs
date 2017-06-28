@@ -14,17 +14,16 @@ pub mod types;
 use self::context::Context;
 use self::scene::BoxedScene;
 use self::context::ResourceContext;
+use self::event::EventSystem;
 use self::graphics::start as graphics_start;
 
-use sdl2::event::Event;
 use std::thread::sleep;
 use self::event::UIInput;
-use sdl2::keyboard::Keycode;
 use std::time::{Duration, Instant};
 use sdl2::image::{INIT_PNG, INIT_JPG};
 
-fn update(mut scene: BoxedScene) -> BoxedScene {
-    match scene.update(&UIInput {}) {
+fn update(mut scene: BoxedScene, input: UIInput) -> BoxedScene {
+    match scene.update(&input) {
         Some(s) => s,
         None => scene,
     }
@@ -42,35 +41,29 @@ pub fn game_start(width: u32, height: u32, title: String, mut current_scene: Box
     let _image_context = sdl2::image::init(INIT_PNG | INIT_JPG).unwrap();
     let ns_per_frame: Duration = Duration::new(0, 1_000_000_000 / fps);
 
-    let mut event_pump = sdl_context.event_pump().unwrap();
-    let mut running = true;
-
-
-    let _ = graphics_start(
+    let event_pump = sdl_context.event_pump().unwrap();
+    graphics_start(
         window.into_canvas().accelerated().build().unwrap(),
         |graphics| {
             let c = Context::new(graphics);
             let rc = ResourceContext::new(graphics);
+            let mut event_system = EventSystem::new(event_pump);
+            let mut running = true;
+            
+            let mut frame:u32 = 0;
             while running {
                 let start = Instant::now();
                 let next_render_step = start + ns_per_frame;
 
-                for event in event_pump.poll_iter() {
-                    match event {
-                        Event::Quit { .. } |
-                        Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                            running = false;
-                        }
-                        _ => {}
-                    }
-                }
+                
                 current_scene.resource_load(&rc);
-                current_scene = update(current_scene);
-                graphics.render(|| { current_scene.render_view(&c); });
+                current_scene = update(current_scene, event_system.process(&mut running));
+                graphics.render(|| { current_scene.render_view(&c, frame); });
                 let now = Instant::now();
                 if next_render_step >= now {
                     sleep(next_render_step - now);
                 }
+                frame += 1;
             }
         },
     );

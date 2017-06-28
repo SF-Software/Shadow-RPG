@@ -10,14 +10,14 @@ pub enum Command {
 pub type Init<M, A> = (fn(A) -> (M, Command));
 pub type ResourceLoad<M, R> = fn(&M, &ResourceContext) -> R;
 pub type Update<M> = (fn(&M, &UIInput) -> (M, Command));
-pub type ViewRenderer<M, R> = fn(&M, &R, &Context);
+pub type ViewRenderer<M, R> = fn(&M, &R, u32, &Context);
 
 
 
 
 pub trait Scene {
     fn update(&mut self, &UIInput) -> Option<BoxedScene>;
-    fn render_view(&self, &Context);
+    fn render_view(&self, &Context, u32);
     fn resource_load(&mut self, &ResourceContext);
 }
 
@@ -51,10 +51,10 @@ impl<M, R> Scene for SceneEntity<M, R> {
         self.model = m;
         process_command(c)
     }
-    fn render_view(&self, context: &Context) {
+    fn render_view(&self, context: &Context, frame: u32) {
         let vr = self.view_renderer;
         if let Some(ref r) = self.resource {
-            vr(&self.model, &r, context);
+            vr(&self.model, &r, frame, context);
         }
 
     }
