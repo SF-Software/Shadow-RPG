@@ -6,7 +6,7 @@ use sdl2::render::{TextureQuery, Texture};
 
 
 
-impl<'a, 'b> Context<'a, 'b> {
+impl<'b> Context<'b> {
     pub fn image_from_file_ex<F>(&self, file: String, callback: F)
     where
         F: FnOnce(CopyAttribute, u32, u32) -> CopyAttribute,

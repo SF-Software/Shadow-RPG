@@ -3,6 +3,7 @@ mod resource_manager;
 
 
 use sdl2::ttf;
+use std::rc::Rc;
 use std::cell::RefCell;
 use sdl2::video::{Window, WindowContext};
 use sdl2::render::{Canvas, TextureCreator};
@@ -42,14 +43,14 @@ where
         self.canvas.borrow_mut().present();
     }
 }
-pub fn start<F: FnOnce(&Graphics)>(canvas: Canvas<Window>, callback: F) {
+pub fn start<F: FnOnce(Rc<Graphics>)>(canvas: Canvas<Window>, callback: F) {
     let ttf_context = ttf::init().unwrap();
     let texture_creator = canvas.texture_creator();
     let font_manager = FontManager::new(&ttf_context);
     let glyph_creator = GlyphCreator::new(font_manager, &texture_creator);
 
-    let r = Graphics::new(canvas, &texture_creator, glyph_creator);
-    callback(&r);
+    let r = Rc::new(Graphics::new(canvas, &texture_creator, glyph_creator));
+    callback(r);
 }
 
 /*

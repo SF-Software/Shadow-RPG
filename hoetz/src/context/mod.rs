@@ -86,15 +86,12 @@ fn into_point(s: Option<(i32, i32)>) -> Option<Point> {
     })
 }
 
-pub struct Context<'a, 'b>
-where
-    'b: 'a,
-{
-    graphics: &'a Graphics<'b>,
+pub struct Context<'b> {
+    graphics: Rc<Graphics<'b>>,
 }
 
-impl<'a, 'b> Context<'a, 'b> {
-    pub fn new(graphics: &'a Graphics<'b>) -> Context<'a, 'b> {
+impl<'b> Context<'b> {
+    pub fn new(graphics: Rc<Graphics<'b>>) -> Context<'b> {
         Self { graphics: graphics }
     }
     pub fn get_canvas<F>(&self, callback: F)

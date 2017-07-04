@@ -37,7 +37,7 @@ impl<'a, 'b> ResourceContext<'a, 'b> {
         t
     }
 }
-impl<'a, 'b> Context<'a, 'b> {
+impl<'b> Context<'b> {
     pub fn get_text(
         &self,
         s: String,

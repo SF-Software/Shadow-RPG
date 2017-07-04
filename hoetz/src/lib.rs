@@ -13,7 +13,6 @@ pub mod types;
 
 use self::context::Context;
 use self::scene::BoxedScene;
-use self::context::ResourceContext;
 use self::event::EventSystem;
 use self::graphics::start as graphics_start;
 
@@ -42,31 +41,24 @@ pub fn game_start(width: u32, height: u32, title: String, mut current_scene: Box
     let ns_per_frame: Duration = Duration::new(0, 1_000_000_000 / fps);
 
     let event_pump = sdl_context.event_pump().unwrap();
-    graphics_start(
-        window.into_canvas().accelerated().build().unwrap(),
-        |graphics| {
-            let c = Context::new(graphics);
-            let rc = ResourceContext::new(graphics);
-            let mut event_system = EventSystem::new(event_pump);
-            let mut running = true;
-            
-            let mut frame:u32 = 0;
-            while running {
-                let start = Instant::now();
-                let next_render_step = start + ns_per_frame;
-
-                
-                current_scene.resource_load(&rc);
-                current_scene = update(current_scene, event_system.process(&mut running));
-                graphics.render(|| { current_scene.render_view(&c, frame); });
-                let now = Instant::now();
-                if next_render_step >= now {
-                    sleep(next_render_step - now);
-                }
-                frame += 1;
+    graphics_start(window.into_canvas().accelerated().build().unwrap(), |graphics| {
+        let c = Context::new(graphics.clone());
+        let mut event_system = EventSystem::new(event_pump);
+        let mut running = true;        
+        let mut frame: u32 = 0;
+        while running {
+            let start = Instant::now();
+            let next_render_step = start + ns_per_frame;
+            current_scene.resource_load(&c);
+            current_scene = update(current_scene, event_system.process(&mut running));
+            graphics.render(|| { current_scene.render_view(&c, frame); });
+            let now = Instant::now();
+            if next_render_step >= now {
+                sleep(next_render_step - now);
             }
-        },
-    );
-
-
+            frame += 1;
+        }
+    });
+   
+    
 }

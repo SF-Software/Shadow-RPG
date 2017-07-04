@@ -32,10 +32,10 @@ struct Model {
 fn init(args: ()) -> (Model, Command) {
     (Model { select_index: 0 }, Command::None)
 }
-fn resource_loader(m: &Model, context: &ResourceContext)->(){
 
-}
-fn r2esource_loader<'a>(m: &Model, context: &'a ResourceContext<'a, 'a>) -> Vec<RcTexture<'a>> {
+fn r2esource_loader(m: &Model, context: &ResourceContext) -> () {}
+
+fn resource_loader<'a>(m: &Model, context: &Context<'a>) -> Vec<RcTexture<'a>> {
     let font = "NotoSansCJKtc-Regular.otf";
     vec!["Start", "Load", "Settings", "Exit"]
         .into_iter()
@@ -45,6 +45,7 @@ fn r2esource_loader<'a>(m: &Model, context: &'a ResourceContext<'a, 'a>) -> Vec<
         })
         .collect()
 }
+
 fn update(m: &Model, i: &UIInput) -> (Model, Command) {
     let mut index = m.select_index;
     if i.keyboard.trigger(KeyCode::Right) {
@@ -59,7 +60,7 @@ fn update(m: &Model, i: &UIInput) -> (Model, Command) {
     (Model { select_index: index }, Command::None)
 }
 
-fn view(m: &Model, r: &(), frame: u32, c: &Context) {
+fn view<'a>(m: &Model, r: &Vec<RcTexture<'a>>, frame: u32, c: &Context) {
 
     c.image_from_file("title.jpg".to_owned(), 0, 0);
 
@@ -87,6 +88,7 @@ fn view(m: &Model, r: &(), frame: u32, c: &Context) {
     });*/
 
 }
+
 fn main() {
     hoetz::game_start(
         800,

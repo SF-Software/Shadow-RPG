@@ -1,5 +1,5 @@
 use super::event::UIInput;
-use super::context::{Context, ResourceContext};
+use super::context::Context;
 
 
 pub enum Command {
@@ -8,25 +8,25 @@ pub enum Command {
 }
 
 pub type Init<M, A> = (fn(A) -> (M, Command));
-pub type ResourceLoad<M, R> = fn(&M, &ResourceContext) -> R;
+pub type ResourceLoad<'a, M, R> = fn(&M, &Context<'a>) -> R;
 pub type Update<M> = (fn(&M, &UIInput) -> (M, Command));
-pub type ViewRenderer<M, R> = fn(&M, &R, u32, &Context);
+pub type ViewRenderer<'a, M, R> = fn(&M, &R, u32, &Context<'a>);
 
 
 
 
-pub trait Scene {
-    fn update(&mut self, &UIInput) -> Option<BoxedScene>;
-    fn render_view(&self, &Context, u32);
-    fn resource_load(&mut self, &ResourceContext);
+pub trait Scene<'a> {
+    fn update(&mut self, &UIInput) -> Option<BoxedScene<'a>>;
+    fn render_view(&self, &Context<'a>, u32);
+    fn resource_load(&mut self, &Context<'a>);
 }
 
-pub type BoxedScene = Box<Scene>;
+pub type BoxedScene<'a> = Box<Scene<'a>>;
 
-pub struct SceneEntity<M, R> {
+pub struct SceneEntity<'a, M, R> {
     upda: Update<M>,
-    resource_loader: ResourceLoad<M, R>,
-    view_renderer: ViewRenderer<M, R>,
+    resource_loader: ResourceLoad<'a, M, R>,
+    view_renderer: ViewRenderer<'a, M, R>,
     model: M,
     resource: Option<R>,
 }
@@ -38,8 +38,8 @@ fn process_command(c: Command) -> Option<BoxedScene> {
     }
 }
 
-impl<M, R> Scene for SceneEntity<M, R> {
-    fn resource_load(&mut self, context: &ResourceContext) {
+impl<'a, M, R> Scene<'a> for SceneEntity<'a, M, R> {
+    fn resource_load(&mut self, context: &Context<'a>) {
         if let None = self.resource {
             let rld = self.resource_loader;
             self.resource = Some(rld(&self.model, context));
@@ -51,7 +51,7 @@ impl<M, R> Scene for SceneEntity<M, R> {
         self.model = m;
         process_command(c)
     }
-    fn render_view(&self, context: &Context, frame: u32) {
+    fn render_view(&self, context: &Context<'a>, frame: u32) {
         let vr = self.view_renderer;
         if let Some(ref r) = self.resource {
             vr(&self.model, &r, frame, context);
@@ -62,13 +62,13 @@ impl<M, R> Scene for SceneEntity<M, R> {
 
 
 
-pub fn new<M, A, R>(
+pub fn new<'a, M, A, R>(
     args: A,
     init: Init<M, A>,
-    resource_loader: ResourceLoad<M, R>,
+    resource_loader: ResourceLoad<'a, M, R>,
     update: Update<M>,
-    view_renderer: ViewRenderer<M, R>,
-) -> Box<SceneEntity<M, R>> {
+    view_renderer: ViewRenderer<'a, M, R>,
+) -> Box<SceneEntity<'a, M, R>> {
     let (m, c) = init(args);
     process_command(c);
     Box::new(SceneEntity {
